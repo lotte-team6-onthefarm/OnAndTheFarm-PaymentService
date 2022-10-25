@@ -1,8 +1,9 @@
 package com.team6.onandthefarmpaymentservice.kafka;
 
-import com.example.tccpayment.dto.PaymentDto;
-import com.example.tccpayment.service.PaymentService;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
+import com.team6.onandthefarmpaymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

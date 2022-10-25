@@ -1,6 +1,7 @@
 package com.team6.onandthefarmpaymentservice.feignclient;
 
-import com.example.tccpayment.entity.ReservedPayment;
+
+import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
 
 public interface PaymentServiceClientService {
     ReservedPayment reservedPayment(String productList, String orderSerial);

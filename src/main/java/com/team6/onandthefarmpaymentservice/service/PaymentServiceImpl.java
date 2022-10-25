@@ -1,9 +1,9 @@
 package com.team6.onandthefarmpaymentservice.service;
 
-import com.example.tccpayment.dto.PaymentDto;
-import com.example.tccpayment.entity.Payment;
-import com.example.tccpayment.repository.PaymentRepository;
-import com.example.tccpayment.util.DateUtils;
+import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
+import com.team6.onandthefarmpaymentservice.entity.Payment;
+import com.team6.onandthefarmpaymentservice.repository.PaymentRepository;
+import com.team6.onandthefarmpaymentservice.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,13 +1,13 @@
 package com.team6.onandthefarmpaymentservice.feignclient;
 
-import com.example.tccpayment.dto.OrderProductDto;
-import com.example.tccpayment.dto.PaymentDto;
-import com.example.tccpayment.entity.ReservedPayment;
-import com.example.tccpayment.kafka.PaymentOrderChannelAdapter;
-import com.example.tccpayment.repository.ReservedPaymentRepository;
-import com.example.tccpayment.service.PaymentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team6.onandthefarmpaymentservice.dto.OrderProductDto;
+import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
+import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
+import com.team6.onandthefarmpaymentservice.kafka.PaymentOrderChannelAdapter;
+import com.team6.onandthefarmpaymentservice.repository.ReservedPaymentRepository;
+import com.team6.onandthefarmpaymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

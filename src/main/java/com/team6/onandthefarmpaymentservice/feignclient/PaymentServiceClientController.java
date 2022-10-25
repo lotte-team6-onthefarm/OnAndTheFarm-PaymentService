@@ -1,9 +1,10 @@
 package com.team6.onandthefarmpaymentservice.feignclient;
 
-import com.example.tccpayment.ParticipantLink;
-import com.example.tccpayment.entity.ReservedPayment;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team6.onandthefarmpaymentservice.ParticipantLink;
+import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
