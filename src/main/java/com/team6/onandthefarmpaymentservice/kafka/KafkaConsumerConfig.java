@@ -38,12 +38,14 @@ public class KafkaConsumerConfig {
     @Bean
     public ConsumerFactory<String,String> consumerFactory(){
         Map<String,Object> properties = new HashMap<>();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,env.getProperty("kafka.url"));
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"13.124.9.207:9092");
         properties.put(ConsumerConfig.GROUP_ID_CONFIG,"consumerGroupId");
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,false);
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"latest");
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,1);
+        properties.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG,600000);
         return new DefaultKafkaConsumerFactory<>(properties);
     }
     @Bean
@@ -53,6 +55,8 @@ public class KafkaConsumerConfig {
         kafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
         kafkaListenerContainerFactory.setCommonErrorHandler(kafkaListenerErrorHandler());
         kafkaListenerContainerFactory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        //kafkaListenerContainerFactory.getContainerProperties().setPollTimeout(3000);
+        //kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(true);
         return kafkaListenerContainerFactory;
     }
 
@@ -64,7 +68,7 @@ public class KafkaConsumerConfig {
     public CommonErrorHandler kafkaListenerErrorHandler() {
         DefaultErrorHandler defaultErrorHandler = new DefaultErrorHandler(
                 new DeadLetterPublishingRecoverer(template, DEAD_TOPIC_DESTINATION_RESOLVER),
-                new FixedBackOff(1000, 1)); // 1초간격으로 최대 3번 시도한다는 의미
+                new FixedBackOff(1000, 5)); // 1초간격으로 최대 3번 시도한다는 의미
 
         defaultErrorHandler.setCommitRecovered(true); // DLQ로 보내지면(리커버리 되었다는의미) 오프셋을 커밋한다는 의미
         defaultErrorHandler.setAckAfterHandle(true);
