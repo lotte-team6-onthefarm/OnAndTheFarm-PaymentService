@@ -8,4 +8,6 @@ public interface PaymentService {
     Payment createPayment(PaymentDto paymentDto);
 
     Boolean isAlreadyProcessedOrderId(String orderSerial);
+
+    Boolean createDlqPayment(PaymentDto paymentDto);
 }

@@ -21,6 +21,8 @@ import java.io.IOException;
 public class PaymentOrderChannelAdapterKafkaImpl implements PaymentOrderChannelAdapter{
     private final String TOPIC = "payment-order";
 
+    private final String DLQ_TOPIC = "dlt-payment-order";
+
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final PaymentService paymentService;
 
@@ -40,6 +42,18 @@ public class PaymentOrderChannelAdapterKafkaImpl implements PaymentOrderChannelA
         }
 
         Long test = Long.valueOf("adsasd");
+
+        // Kafka Offset Manual Commit(수동커밋)
+        ack.acknowledge();
+    }
+
+    @KafkaListener(topics = DLQ_TOPIC,containerFactory = "kafkaListenerContainerFactory")
+    public void dlq_consumer(String message, Acknowledgment ack) throws Exception {
+        log.info(String.format("Dead-Message Received : %s", message));
+        ObjectMapper objectMapper = new ObjectMapper();
+        PaymentDto paymentDto = objectMapper.readValue(message, PaymentDto.class);
+
+        paymentService.createDlqPayment(paymentDto);
 
         // Kafka Offset Manual Commit(수동커밋)
         ack.acknowledge();
