@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,9 +41,10 @@ public class PaymentServiceImpl implements PaymentService{
      * @return true : 중복되지 않은 메시지 / false : 중복된 메시지
      */
     public Boolean isAlreadyProcessedOrderId(String orderSerial){
-        Optional<Payment> payment = paymentRepository.findByOrderSerial(orderSerial);
+        //List<Payment> payment = paymentRepository.findByOrderSerial(orderSerial);
 
-        if(payment.isPresent()){ // 이미 처리된 메시지라는 의미(중복이라는 의미)
+        boolean result = paymentRepository.existsByOrderSerial(orderSerial); // true : 존재 / false : 미존재
+        if(result){ // 이미 처리된 메시지라는 의미(중복이라는 의미)
             return Boolean.FALSE;
         }
         return Boolean.TRUE; // 중복되지 않은 메시지라는 의미

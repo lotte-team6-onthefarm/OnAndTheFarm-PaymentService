@@ -41,7 +41,7 @@ public class PaymentOrderChannelAdapterKafkaImpl implements PaymentOrderChannelA
             paymentService.createPayment(paymentDto);
         }
 
-        Long test = Long.valueOf("adsasd");
+        //Long test = Long.valueOf("adsasd");
 
         // Kafka Offset Manual Commit(수동커밋)
         ack.acknowledge();
