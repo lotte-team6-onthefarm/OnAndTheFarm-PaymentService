@@ -41,7 +41,7 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
         ReservedPayment reservedPayment = ReservedPayment.builder()
                 .productList(productList)
                 .createdDate(LocalDateTime.now())
-                .expireTime(LocalDateTime.now().plus(3l, ChronoUnit.SECONDS))
+                .expireTime(LocalDateTime.now().plus(10l, ChronoUnit.SECONDS))
                 .orderSerial(orderSerial)
                 .build();
         return reservedPaymentRepository.save(reservedPayment);
