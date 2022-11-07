@@ -1,7 +1,9 @@
 package com.team6.onandthefarmpaymentservice.service;
 
 import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
+import com.team6.onandthefarmpaymentservice.entity.DlqPayment;
 import com.team6.onandthefarmpaymentservice.entity.Payment;
+import com.team6.onandthefarmpaymentservice.repository.DlqPaymentRepository;
 import com.team6.onandthefarmpaymentservice.repository.PaymentRepository;
 import com.team6.onandthefarmpaymentservice.util.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ import java.util.Optional;
 public class PaymentServiceImpl implements PaymentService{
 
     private final PaymentRepository paymentRepository;
+
+    private final DlqPaymentRepository dlqPaymentRepository;
 
     private final DateUtils dateUtils;
 
@@ -44,5 +48,26 @@ public class PaymentServiceImpl implements PaymentService{
             return Boolean.FALSE;
         }
         return Boolean.TRUE; // 중복되지 않은 메시지라는 의미
+    }
+
+    @Override
+    public Boolean createDlqPayment(PaymentDto paymentDto) {
+        DlqPayment dlqPayment = DlqPayment.builder()
+                .orderSerial(paymentDto.getOrderSerial())
+                .paymentDepositBank(paymentDto.getPaymentDepositBank())
+                .paymentMethod(paymentDto.getPaymentMethod())
+                .paymentDepositName(paymentDto.getPaymentDepositName())
+                .paymentRefundAccount(paymentDto.getPaymentRefundAccount())
+                .paymentDepositAmount(paymentDto.getPaymentDepositAmount())
+                .paymentRefundAccountName(paymentDto.getPaymentRefundAccountName())
+                .build();
+
+        DlqPayment saveDlqPayment = dlqPaymentRepository.save(dlqPayment);
+
+        if(saveDlqPayment==null){
+            return false;
+        }
+
+        return true;
     }
 }
