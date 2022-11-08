@@ -32,6 +32,11 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.3.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 	implementation 'io.springfox:springfox-swagger2:3.0.0'
+	implementation group: 'com.google.code.gson', name: 'gson'
+
+	//json
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+	implementation group: 'org.json', name: 'json', version: '20210307'
 
 	compileOnly 'org.projectlombok:lombok'
 	compileOnly 'io.springfox:springfox-boot-starter:3.0.0'

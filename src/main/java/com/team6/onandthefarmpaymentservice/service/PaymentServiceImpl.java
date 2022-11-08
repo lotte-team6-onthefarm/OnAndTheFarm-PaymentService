@@ -1,17 +1,27 @@
 package com.team6.onandthefarmpaymentservice.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
 import com.team6.onandthefarmpaymentservice.entity.DlqPayment;
 import com.team6.onandthefarmpaymentservice.entity.Payment;
 import com.team6.onandthefarmpaymentservice.repository.DlqPaymentRepository;
 import com.team6.onandthefarmpaymentservice.repository.PaymentRepository;
 import com.team6.onandthefarmpaymentservice.util.DateUtils;
+import com.team6.onandthefarmpaymentservice.util.PaymentUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
+import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,11 +36,19 @@ public class PaymentServiceImpl implements PaymentService{
 
     private final DateUtils dateUtils;
 
-    public Payment createPayment(PaymentDto paymentDto){
+    private final PaymentUtils paymentUtils;
+
+    public Payment createPayment(PaymentApiDto paymentDto) throws IOException {
+        String token = paymentUtils.getToken(); // JWT 토큰 가져오기
+
+        System.out.println("토큰 : " + token);
+        // 결제 완료된 금액
+        int amount = paymentUtils.paymentInfo(paymentDto.getImp_uid(), token);
+
         Payment payment = Payment.builder()
                 .orderSerial(paymentDto.getOrderSerial())
                 .paymentDate(dateUtils.transDate("yyyy.MM.dd HH:mm:ss"))
-                .paymentDepositAmount(paymentDto.getPaymentDepositAmount())
+                .paymentDepositAmount(amount)
                 .build();
         return paymentRepository.save(payment);
     }
