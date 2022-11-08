@@ -2,6 +2,7 @@ package com.team6.onandthefarmpaymentservice.kafka;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
 import com.team6.onandthefarmpaymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class PaymentOrderChannelAdapterKafkaImpl implements PaymentOrderChannelA
     public void consumer(String message, Acknowledgment ack) throws Exception {
         log.info(String.format("Message Received : %s", message));
         ObjectMapper objectMapper = new ObjectMapper();
-        PaymentDto paymentDto = objectMapper.readValue(message, PaymentDto.class);
+        PaymentApiDto paymentDto = objectMapper.readValue(message, PaymentApiDto.class);
         if(paymentService.isAlreadyProcessedOrderId(paymentDto.getOrderSerial())){
             // 중복되지 않은 메시지임으로 결제 생성
             paymentService.createPayment(paymentDto);

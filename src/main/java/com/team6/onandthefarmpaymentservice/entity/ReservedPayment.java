@@ -31,6 +31,12 @@ public class ReservedPayment {
 
     private String status;
 
+    private String imp_uid;
+
+    private String merchant_uid;
+
+    private String paid_amount;
+
     public void validate() {
         validateStatus();
         validateExpired();

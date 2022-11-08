@@ -3,6 +3,7 @@ package com.team6.onandthefarmpaymentservice.feignclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team6.onandthefarmpaymentservice.dto.OrderProductDto;
+import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
 import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
 import com.team6.onandthefarmpaymentservice.kafka.PaymentOrderChannelAdapter;
@@ -37,12 +38,15 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
      * @param productList
      * @return
      */
-    public ReservedPayment reservedPayment(String productList, String orderSerial) {
+    public ReservedPayment reservedPayment(String productList, PaymentApiDto paymentApiDto) {
         ReservedPayment reservedPayment = ReservedPayment.builder()
                 .productList(productList)
                 .createdDate(LocalDateTime.now())
                 .expireTime(LocalDateTime.now().plus(10l, ChronoUnit.SECONDS))
-                .orderSerial(orderSerial)
+                .orderSerial(paymentApiDto.getOrderSerial())
+                .imp_uid(paymentApiDto.getImp_uid())
+                .merchant_uid(paymentApiDto.getMerchant_uid())
+                .paid_amount(paymentApiDto.getPaid_amount())
                 .build();
         return reservedPaymentRepository.save(reservedPayment);
     }
@@ -82,9 +86,11 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
         // ReservedStock 상태 변경
         reservedPayment.setStatus("CONFIRMED");
         // 이후 confirm 메시지를 생성 및 전송
-        PaymentDto paymentDto = PaymentDto.builder()
+        PaymentApiDto paymentDto = PaymentApiDto.builder()
                 .orderSerial(reservedPayment.getOrderSerial())
-                .paymentDepositAmount(totalPrice)
+                .paid_amount(reservedPayment.getPaid_amount())
+                .merchant_uid(reservedPayment.getMerchant_uid())
+                .imp_uid(reservedPayment.getImp_uid())
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
         String message = ""; // confirm 메시지
