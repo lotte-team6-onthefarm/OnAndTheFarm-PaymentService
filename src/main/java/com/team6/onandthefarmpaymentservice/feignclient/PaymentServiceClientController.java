@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team6.onandthefarmpaymentservice.ParticipantLink;
 import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
-import com.team6.onandthefarmpaymentservice.service.PaymentService;
-import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
+import com.team6.onandthefarmpaymentservice.kafka.vo.Payload;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,7 +69,7 @@ public class PaymentServiceClientController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         // 주문 예약 테이블에 예약 저장
-        ReservedPayment reservedPayment = paymentServiceClientService.reservedPayment(productList,paymentApiDto);
+        Payload reservedPayment = paymentServiceClientService.reservedPayment(productList,paymentApiDto);
 
         final ParticipantLink participantLink = buildParticipantLink(
                 reservedPayment.getReservedPaymentId(),
@@ -87,7 +87,7 @@ public class PaymentServiceClientController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private ParticipantLink buildParticipantLink(final Long id, LocalDateTime expire) {
+    private ParticipantLink buildParticipantLink(final Long id, String expire) {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
         return new ParticipantLink(location, expire);
     }

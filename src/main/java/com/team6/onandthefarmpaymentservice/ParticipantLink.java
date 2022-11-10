@@ -12,5 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ParticipantLink {
     private URI uri;
-    private LocalDateTime expires;
+
+    private String expires;
 }
