@@ -10,6 +10,7 @@ import com.team6.onandthefarmpaymentservice.repository.DlqPaymentRepository;
 import com.team6.onandthefarmpaymentservice.repository.PaymentRepository;
 import com.team6.onandthefarmpaymentservice.util.DateUtils;
 import com.team6.onandthefarmpaymentservice.util.PaymentUtils;
+import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -87,5 +88,15 @@ public class PaymentServiceImpl implements PaymentService{
         }
 
         return true;
+    }
+
+    @Override
+    public void cancelPayment(PaymentVo paymentVo) throws IOException {
+        String token = paymentUtils.getToken(); // JWT 토큰 가져오기
+
+        System.out.println("토큰 : " + token);
+        // 결제 완료된 금액
+        int amount = paymentUtils.paymentInfo(paymentVo.getImp_uid(), token);
+        paymentUtils.payMentCancle(token,paymentVo.getImp_uid(),amount,"결제 취소");
     }
 }
