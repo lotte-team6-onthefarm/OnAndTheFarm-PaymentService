@@ -7,16 +7,19 @@ import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
 import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
 import com.team6.onandthefarmpaymentservice.kafka.PaymentOrderChannelAdapter;
+import com.team6.onandthefarmpaymentservice.kafka.vo.*;
 import com.team6.onandthefarmpaymentservice.repository.ReservedPaymentRepository;
 import com.team6.onandthefarmpaymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,23 +35,53 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
 
     private final PaymentService paymentService;
 
+    private KafkaTemplate<String,String> kafkaTemplate;
+
+    private final String topic = "my_connect_reserved_payment";
+
+    List<Field> fields = Arrays.asList(new Field("int64",false,"reserved_payment_id"),
+            new Field("string",true,"created_date"),
+            new Field("string",true,"expire_time"),
+            new Field("string",true,"order_serial"),
+            new Field("string",true,"product_list"),
+            new Field("string",true,"status"),
+            new Field("string",true,"imp_uid"),
+            new Field("string",true,"merchant_uid"),
+            new Field("string",true,"paid_amount"));
+    Schema schema = Schema.builder()
+            .type("struct")
+            .fields(fields)
+            .optional(false)
+            .name("reserved_payment")
+            .build();
+
 
     /**
      * 주문 예약 테이블에 주문 정보를 db에 저장하는 메서드(try)
      * @param productList
      * @return
      */
-    public ReservedPayment reservedPayment(String productList, PaymentApiDto paymentApiDto) {
-        ReservedPayment reservedPayment = ReservedPayment.builder()
+    public Payload reservedPayment(String productList, PaymentApiDto paymentApiDto) {
+        Payload payload = Payload.builder()
                 .productList(productList)
-                .createdDate(LocalDateTime.now())
-                .expireTime(LocalDateTime.now().plus(10l, ChronoUnit.SECONDS))
+                .createdDate(LocalDateTime.now().toString())
+                .expireTime(LocalDateTime.now().plus(10l, ChronoUnit.SECONDS).toString())
                 .orderSerial(paymentApiDto.getOrderSerial())
                 .imp_uid(paymentApiDto.getImp_uid())
                 .merchant_uid(paymentApiDto.getMerchant_uid())
                 .paid_amount(paymentApiDto.getPaid_amount())
                 .build();
-        return reservedPaymentRepository.save(reservedPayment);
+        KafkaPaymentDto kafkaPaymentDto = new KafkaPaymentDto(schema,payload);
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonInString = "";
+        try{
+            jsonInString = mapper.writeValueAsString(kafkaPaymentDto);
+        }catch(JsonProcessingException ex){
+            ex.printStackTrace();
+        }
+
+        kafkaTemplate.send(topic,jsonInString);
+        return payload;
     }
 
     /**
