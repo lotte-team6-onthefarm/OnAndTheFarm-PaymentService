@@ -6,12 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team6.onandthefarmpaymentservice.ParticipantLink;
 import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
+import com.team6.onandthefarmpaymentservice.service.PaymentService;
+import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -21,6 +24,8 @@ import java.util.Map;
 public class PaymentServiceClientController {
 
     private final PaymentServiceClientService paymentServiceClientService;
+
+    private final PaymentService paymentService;
 
     @PostMapping("/api/feign/user/payment/payment-service/payment-try")
     public ResponseEntity<ParticipantLink> paymentTry(@RequestBody Map<String, Object> map){
@@ -91,6 +96,17 @@ public class PaymentServiceClientController {
     public ResponseEntity<Void> cancelOrderAdjustment(@PathVariable Long id) {
         paymentServiceClientService.cancelOrder(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/api/feign/payment-service/cancel")
+    public Boolean cancelPayment(@RequestBody PaymentVo paymentVo) {
+        try {
+            paymentService.cancelPayment(paymentVo);
+        }catch (IOException e){
+            e.printStackTrace();
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
     }
 
 }
