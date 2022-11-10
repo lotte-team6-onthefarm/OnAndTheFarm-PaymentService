@@ -22,7 +22,7 @@ public class PaymentServiceClientController {
 
     private final PaymentServiceClientService paymentServiceClientService;
 
-    @PostMapping("/api/user/payment/payment-service/payment-try")
+    @PostMapping("/api/feign/user/payment/payment-service/payment-try")
     public ResponseEntity<ParticipantLink> paymentTry(@RequestBody Map<String, Object> map){
         String productList = "";
         String orderSerial = "";
@@ -72,7 +72,7 @@ public class PaymentServiceClientController {
         return new ResponseEntity<>(participantLink, HttpStatus.CREATED);
     }
 
-    @PutMapping("/api/user/payment/payment-service/payment-try/{id}")
+    @PutMapping("/api/feign/user/payment/payment-service/payment-try/{id}")
     public ResponseEntity<Void> confirmPaymentAdjustment(@PathVariable Long id) {
         try {
             paymentServiceClientService.confirmPayment(id);
@@ -87,7 +87,7 @@ public class PaymentServiceClientController {
         return new ParticipantLink(location, expire);
     }
 
-    @DeleteMapping("/api/user/payment/payment-service/payment-try/{id}")
+    @DeleteMapping("/api/feign/user/payment/payment-service/payment-try/{id}")
     public ResponseEntity<Void> cancelOrderAdjustment(@PathVariable Long id) {
         paymentServiceClientService.cancelOrder(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
