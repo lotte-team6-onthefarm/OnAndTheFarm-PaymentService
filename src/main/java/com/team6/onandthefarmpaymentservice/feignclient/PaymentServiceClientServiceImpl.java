@@ -18,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -35,19 +32,19 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
 
     private final PaymentService paymentService;
 
-    private KafkaTemplate<String,String> kafkaTemplate;
+    private final KafkaTemplate<String,String> kafkaTemplate;
 
-    private final String topic = "my_connect_reserved_payment";
+    private final String topic = "reserved_payment_sink";
 
     List<Field> fields = Arrays.asList(new Field("int64",false,"reserved_payment_id"),
             new Field("string",true,"created_date"),
             new Field("string",true,"expire_time"),
-            new Field("string",true,"order_serial"),
-            new Field("string",true,"product_list"),
-            new Field("string",true,"status"),
             new Field("string",true,"imp_uid"),
             new Field("string",true,"merchant_uid"),
-            new Field("string",true,"paid_amount"));
+            new Field("string",true,"order_serial"),
+            new Field("string",true,"paid_amount"),
+            new Field("string",true,"product_list"),
+            new Field("string",true,"status"));
     Schema schema = Schema.builder()
             .type("struct")
             .fields(fields)
@@ -63,10 +60,11 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
      */
     public Payload reservedPayment(String productList, PaymentApiDto paymentApiDto) {
         Payload payload = Payload.builder()
-                .productList(productList)
-                .createdDate(LocalDateTime.now().toString())
-                .expireTime(LocalDateTime.now().plus(10l, ChronoUnit.SECONDS).toString())
-                .orderSerial(paymentApiDto.getOrderSerial())
+                .reserved_payment_id(Long.valueOf(new Date().getTime()))
+                .created_date(LocalDateTime.now().toString())
+                .expire_time(LocalDateTime.now().plus(10l, ChronoUnit.SECONDS).toString())
+                .order_serial(paymentApiDto.getOrderSerial())
+                .product_list(productList)
                 .imp_uid(paymentApiDto.getImp_uid())
                 .merchant_uid(paymentApiDto.getMerchant_uid())
                 .paid_amount(paymentApiDto.getPaid_amount())
