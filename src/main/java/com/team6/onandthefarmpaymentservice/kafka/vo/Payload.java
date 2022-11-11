@@ -8,21 +8,21 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class Payload {
-    private Long reservedPaymentId;
+    private Long reserved_payment_id;
 
-    private String productList;
+    private String created_date;
 
-    private String orderSerial;
-
-    private String createdDate;
-
-    private String expireTime;
-
-    private String status;
+    private String expire_time;
 
     private String imp_uid;
 
     private String merchant_uid;
 
+    private String order_serial;
+
     private String paid_amount;
+
+    private String product_list;
+
+    private String status;
 }

@@ -8,6 +8,8 @@ import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
 import com.team6.onandthefarmpaymentservice.kafka.vo.Payload;
 
+import com.team6.onandthefarmpaymentservice.service.PaymentService;
+import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,8 +74,8 @@ public class PaymentServiceClientController {
         Payload reservedPayment = paymentServiceClientService.reservedPayment(productList,paymentApiDto);
 
         final ParticipantLink participantLink = buildParticipantLink(
-                reservedPayment.getReservedPaymentId(),
-                reservedPayment.getExpireTime());
+                reservedPayment.getReserved_payment_id(),
+                reservedPayment.getExpire_time());
         return new ResponseEntity<>(participantLink, HttpStatus.CREATED);
     }
 
