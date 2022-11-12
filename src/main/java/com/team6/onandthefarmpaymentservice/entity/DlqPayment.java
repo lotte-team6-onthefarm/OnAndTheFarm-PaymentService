@@ -22,15 +22,9 @@ public class DlqPayment {
 
     private String orderSerial;
 
-    private String paymentMethod;
+    private String imp_uid;
 
-    private Integer paymentDepositAmount;
+    private String merchant_uid;
 
-    private String paymentDepositName;
-
-    private String paymentDepositBank;
-
-    private String paymentRefundAccount;
-
-    private String paymentRefundAccountName;
+    private String paid_amount;
 }

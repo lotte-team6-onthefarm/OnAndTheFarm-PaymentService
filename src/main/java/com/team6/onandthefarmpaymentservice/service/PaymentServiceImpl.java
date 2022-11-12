@@ -2,6 +2,7 @@ package com.team6.onandthefarmpaymentservice.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.team6.onandthefarmpaymentservice.dto.DlqPaymentDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
 import com.team6.onandthefarmpaymentservice.entity.DlqPayment;
@@ -10,6 +11,7 @@ import com.team6.onandthefarmpaymentservice.repository.DlqPaymentRepository;
 import com.team6.onandthefarmpaymentservice.repository.PaymentRepository;
 import com.team6.onandthefarmpaymentservice.util.DateUtils;
 import com.team6.onandthefarmpaymentservice.util.PaymentUtils;
+import com.team6.onandthefarmpaymentservice.vo.DlqPaymentResponse;
 import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -42,7 +42,7 @@ public class PaymentServiceImpl implements PaymentService{
     public Payment createPayment(PaymentApiDto paymentDto) throws IOException {
         String token = paymentUtils.getToken(); // JWT 토큰 가져오기
 
-        System.out.println("토큰 : " + token);
+        //System.out.println("토큰 : " + token);
         // 결제 완료된 금액
         int amount = paymentUtils.paymentInfo(paymentDto.getImp_uid(), token);
 
@@ -70,15 +70,12 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public Boolean createDlqPayment(PaymentDto paymentDto) {
+    public Boolean createDlqPayment(DlqPaymentDto paymentDto) {
         DlqPayment dlqPayment = DlqPayment.builder()
                 .orderSerial(paymentDto.getOrderSerial())
-                .paymentDepositBank(paymentDto.getPaymentDepositBank())
-                .paymentMethod(paymentDto.getPaymentMethod())
-                .paymentDepositName(paymentDto.getPaymentDepositName())
-                .paymentRefundAccount(paymentDto.getPaymentRefundAccount())
-                .paymentDepositAmount(paymentDto.getPaymentDepositAmount())
-                .paymentRefundAccountName(paymentDto.getPaymentRefundAccountName())
+                .imp_uid(paymentDto.getImp_uid())
+                .merchant_uid(paymentDto.getMerchant_uid())
+                .paid_amount(paymentDto.getPaid_amount())
                 .build();
 
         DlqPayment saveDlqPayment = dlqPaymentRepository.save(dlqPayment);
@@ -98,5 +95,33 @@ public class PaymentServiceImpl implements PaymentService{
         // 결제 완료된 금액
         int amount = paymentUtils.paymentInfo(paymentVo.getImp_uid(), token);
         paymentUtils.payMentCancle(token,paymentVo.getImp_uid(),amount,"결제 취소");
+    }
+
+    /**
+     * dlt-payment-order 에 저장된 메시지를 가져오는 메서드
+     */
+    @Override
+    public List<DlqPaymentResponse> findDltPayment() {
+        List<DlqPaymentResponse> responses = new ArrayList<>();
+
+        Iterator<DlqPayment> dlqPaymentIterator = dlqPaymentRepository.findAll().iterator();
+        while(true){
+            if(dlqPaymentIterator.hasNext()){
+                DlqPayment dlqPayment = dlqPaymentIterator.next();
+
+                DlqPaymentResponse response = DlqPaymentResponse.builder()
+                        .dlqPaymentId(dlqPayment.getDlqPaymentId())
+                        .orderSerial(dlqPayment.getOrderSerial())
+                        .paymentDepositAmount(Integer.valueOf(dlqPayment.getPaid_amount()))
+                        .build();
+
+                responses.add(response);
+            }
+            else{
+                break;
+            }
+        }
+
+        return responses;
     }
 }
