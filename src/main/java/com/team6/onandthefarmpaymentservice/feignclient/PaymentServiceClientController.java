@@ -9,6 +9,8 @@ import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
 import com.team6.onandthefarmpaymentservice.kafka.vo.Payload;
 
 import com.team6.onandthefarmpaymentservice.service.PaymentService;
+import com.team6.onandthefarmpaymentservice.util.BaseResponse;
+import com.team6.onandthefarmpaymentservice.vo.DlqPaymentResponse;
 import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -111,4 +114,15 @@ public class PaymentServiceClientController {
         return Boolean.TRUE;
     }
 
+    @GetMapping("/api/admin/payment-service/dlt-payment")
+    public ResponseEntity<BaseResponse<List<DlqPaymentResponse>>> findDltPayment(){
+        List<DlqPaymentResponse> dlqPaymentResponses = paymentService.findDltPayment();
+
+        BaseResponse baseResponse = BaseResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("OK")
+                .data(dlqPaymentResponses)
+                .build();
+        return new ResponseEntity(baseResponse,HttpStatus.OK);
+    }
 }
