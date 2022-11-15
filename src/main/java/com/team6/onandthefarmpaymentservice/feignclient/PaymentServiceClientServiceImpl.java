@@ -62,7 +62,7 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
         Payload payload = Payload.builder()
                 .reserved_payment_id(Long.valueOf(new Date().getTime()))
                 .created_date(LocalDateTime.now().toString())
-                .expire_time(LocalDateTime.now().plus(10l, ChronoUnit.SECONDS).toString())
+                .expire_time(LocalDateTime.now().plus(100l, ChronoUnit.SECONDS).toString())
                 .order_serial(paymentApiDto.getOrderSerial())
                 .product_list(productList)
                 .imp_uid(paymentApiDto.getImp_uid())
