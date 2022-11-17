@@ -40,6 +40,9 @@ public class PaymentServiceImpl implements PaymentService{
     private final PaymentUtils paymentUtils;
 
     public Payment createPayment(PaymentApiDto paymentDto) throws IOException {
+        if(paymentDto.getPaid_amount().equals("2")){
+            Long test = Long.valueOf("adsasd");
+        }
         Payment payment = Payment.builder()
                 .orderSerial(paymentDto.getOrderSerial())
                 .paymentDate(dateUtils.transDate("yyyy.MM.dd HH:mm:ss"))
