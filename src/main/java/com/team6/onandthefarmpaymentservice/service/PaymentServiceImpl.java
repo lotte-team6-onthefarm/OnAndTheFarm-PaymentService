@@ -40,16 +40,10 @@ public class PaymentServiceImpl implements PaymentService{
     private final PaymentUtils paymentUtils;
 
     public Payment createPayment(PaymentApiDto paymentDto) throws IOException {
-        String token = paymentUtils.getToken(); // JWT 토큰 가져오기
-
-        //System.out.println("토큰 : " + token);
-        // 결제 완료된 금액
-        int amount = paymentUtils.paymentInfo(paymentDto.getImp_uid(), token);
-
         Payment payment = Payment.builder()
                 .orderSerial(paymentDto.getOrderSerial())
                 .paymentDate(dateUtils.transDate("yyyy.MM.dd HH:mm:ss"))
-                .paymentDepositAmount(amount)
+                .paymentDepositAmount(Integer.valueOf(paymentDto.getPaid_amount()))
                 .build();
         return paymentRepository.save(payment);
     }

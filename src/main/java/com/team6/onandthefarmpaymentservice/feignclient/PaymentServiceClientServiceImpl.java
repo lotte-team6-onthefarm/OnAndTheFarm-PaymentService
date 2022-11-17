@@ -10,12 +10,14 @@ import com.team6.onandthefarmpaymentservice.kafka.PaymentOrderChannelAdapter;
 import com.team6.onandthefarmpaymentservice.kafka.vo.*;
 import com.team6.onandthefarmpaymentservice.repository.ReservedPaymentRepository;
 import com.team6.onandthefarmpaymentservice.service.PaymentService;
+import com.team6.onandthefarmpaymentservice.util.PaymentUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -33,6 +35,8 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
     private final PaymentService paymentService;
 
     private final KafkaTemplate<String,String> kafkaTemplate;
+
+    private final PaymentUtils paymentUtils;
 
     private final String topic = "reserved_payment_sink";
 
@@ -87,7 +91,7 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
      * @param id : 예약 테이블에 저장된 예약된 주문 정보의 pk값
      * @return
      */
-    public Boolean confirmPayment(Long id) {
+    public Boolean confirmPayment(Long id) throws IOException {
         ReservedPayment reservedPayment = reservedPaymentRepository.findById(id).get();
         reservedPayment.validate(); // 예약 정보의 유효성 검증
 
@@ -130,9 +134,16 @@ public class PaymentServiceClientServiceImpl implements PaymentServiceClientServ
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        String token = paymentUtils.getToken(); // JWT 토큰 가져오기
 
-        paymentOrderChannelAdapter.producer(message);
-        return Boolean.TRUE;
+        //System.out.println("토큰 : " + token);
+        // 결제 완료된 금액
+        int amount = paymentUtils.paymentInfo(paymentDto.getImp_uid(), token);
+        if(paymentDto.getPaid_amount().equals(String.valueOf(amount))){ // 검증
+            paymentOrderChannelAdapter.producer(message);
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     public void cancelOrder(Long id) {

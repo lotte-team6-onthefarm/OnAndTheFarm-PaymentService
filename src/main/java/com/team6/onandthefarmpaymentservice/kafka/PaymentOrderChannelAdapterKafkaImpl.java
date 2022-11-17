@@ -6,6 +6,7 @@ import com.team6.onandthefarmpaymentservice.dto.DlqPaymentDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.dto.PaymentDto;
 import com.team6.onandthefarmpaymentservice.service.PaymentService;
+import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -43,7 +44,7 @@ public class PaymentOrderChannelAdapterKafkaImpl implements PaymentOrderChannelA
             paymentService.createPayment(paymentDto);
         }
 
-        //Long test = Long.valueOf("adsasd");
+        Long test = Long.valueOf("adsasd");
 
         // Kafka Offset Manual Commit(수동커밋)
         ack.acknowledge();
@@ -54,6 +55,12 @@ public class PaymentOrderChannelAdapterKafkaImpl implements PaymentOrderChannelA
         log.info(String.format("Dead-Message Received : %s", message));
         ObjectMapper objectMapper = new ObjectMapper();
         DlqPaymentDto paymentDto = objectMapper.readValue(message, DlqPaymentDto.class);
+        PaymentVo paymentVo = PaymentVo.builder()
+                .imp_uid(paymentDto.getImp_uid())
+                .merchant_uid(paymentDto.getMerchant_uid())
+                .paid_amount(paymentDto.getPaid_amount())
+                .build();
+        paymentService.cancelPayment(paymentVo);
 
         paymentService.createDlqPayment(paymentDto);
 
