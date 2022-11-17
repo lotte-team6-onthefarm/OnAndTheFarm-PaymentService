@@ -88,6 +88,8 @@ public class PaymentServiceClientController {
             paymentServiceClientService.confirmPayment(id);
         } catch(IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IOException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
