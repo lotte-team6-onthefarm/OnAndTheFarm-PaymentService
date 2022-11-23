@@ -8,10 +8,12 @@ import com.team6.onandthefarmpaymentservice.dto.PaymentApiDto;
 import com.team6.onandthefarmpaymentservice.entity.ReservedPayment;
 import com.team6.onandthefarmpaymentservice.kafka.vo.Payload;
 
+import com.team6.onandthefarmpaymentservice.service.MailService;
 import com.team6.onandthefarmpaymentservice.service.PaymentService;
 import com.team6.onandthefarmpaymentservice.util.BaseResponse;
 import com.team6.onandthefarmpaymentservice.vo.DlqPaymentResponse;
 import com.team6.onandthefarmpaymentservice.vo.PaymentVo;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,8 @@ public class PaymentServiceClientController {
     private final PaymentServiceClientService paymentServiceClientService;
 
     private final PaymentService paymentService;
+
+    private final MailService mailService;
 
     @PostMapping("/api/feign/user/payment/payment-service/payment-try")
     public ResponseEntity<ParticipantLink> paymentTry(@RequestBody Map<String, Object> map){
@@ -126,5 +130,19 @@ public class PaymentServiceClientController {
                 .data(dlqPaymentResponses)
                 .build();
         return new ResponseEntity(baseResponse,HttpStatus.OK);
+    }
+
+    @PostMapping("/api/admin/payment-service/email") // 처리되지 않은 메시지 처리하도록 이메일 전송
+    @ApiOperation(value = "dlq 처리")
+    public ResponseEntity<BaseResponse> emailOrder(@RequestBody Map<String,String> map){
+        String orderSerial = map.get("orderSerial");
+        Integer price = Integer.valueOf(map.get("price"));
+        mailService.sendAuthMail(orderSerial,price);
+
+        BaseResponse response = BaseResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("OK")
+                .build();
+        return new ResponseEntity(response,HttpStatus.OK);
     }
 }
