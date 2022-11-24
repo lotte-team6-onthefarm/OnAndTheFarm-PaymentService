@@ -45,7 +45,7 @@ public class MailServiceImp implements MailService{
             sendMail.setSubject("죄송합니다. 결제가 취소되었습니다. 다시 결제를 시도 해주세요.");
             sendMail.setText(new StringBuffer().append("<h1>[결제 취소에 대한 재결제]</h1>")
                     .append("<p>아래 링크를 클릭하시면 결제 페이지로 이동됩니다.</p>")
-                    .append("localhost:3000/repayment?price="+price)
+                    .append("localhost:3000/repayment?orderserial="+orderSerial+"&price="+price)
                     .append("<p>주문번호 : "+orderSerial+"</p>")
                     .append("<p>결제금액 : "+price+"</p>")
                     .append("<h1>[재결제가 완료되면 배송이 시작됩니다]</h1>")
